@@ -44,7 +44,7 @@ def find_closest_match(text_mfcc, audio_data):
 
 
 # Генерация речи
-def generate_speech(text, audio_data):
+def generate_speech(text, audio_data, output_file):
     text = filter_text(text)
     # Разбиваем текст на слова
     words = text.split()
@@ -71,8 +71,4 @@ def generate_speech(text, audio_data):
     full_speech = np.concatenate(speech_segments)
 
     # Сохраняем результат
-    sf.write("output_dtw.wav", full_speech, 22050)
-
-
-# Пример вызова
-generate_speech("Привет, общество!", audio_data)
+    sf.write(output_file, full_speech, 22050)

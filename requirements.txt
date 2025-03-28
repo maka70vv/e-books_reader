@@ -202,6 +202,7 @@ pytesseract==0.3.13
 python-dateutil @ file:///croot/python-dateutil_1716495738603/work
 python-docx==1.1.2
 python-json-logger @ file:///work/perseverance-python-buildout/croot/python-json-logger_1698873656334/work
+pyttsx3==2.98
 pytz @ file:///croot/pytz_1713974312559/work
 pyxnat==1.6.3
 PyYAML @ file:///croot/pyyaml_1728657952215/work
