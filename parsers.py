@@ -19,8 +19,14 @@ def extract_text_from_epub(epub_path):
     text = ""
 
     for item in book.get_items():
-        if item.get_type() == ebooklib.ITEM_DOCUMENT:
+        if item.get_type() == ebooklib.ITEM_DOCUMENT:  # Проверка, что это документ (HTML)
             soup = BeautifulSoup(item.content, "html.parser")
+
+            # Удаляем все теги <title>
+            for title_tag in soup.find_all('title'):
+                title_tag.decompose()  # Удаляем тег <title> и его содержимое
+
+            # Извлекаем текст
             text += soup.get_text()
 
     return text

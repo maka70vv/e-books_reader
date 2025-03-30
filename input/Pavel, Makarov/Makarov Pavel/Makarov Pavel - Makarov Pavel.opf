@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="uuid_id" version="2.0">
+    <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
+        <dc:identifier opf:scheme="calibre" id="calibre_id">1</dc:identifier>
+        <dc:identifier opf:scheme="uuid" id="uuid_id">b68bbca3-ac91-4c60-8d3b-0d2acbdfd961</dc:identifier>
+        <dc:title>Makarov Pavel</dc:title>
+        <dc:creator opf:file-as="Pavel, Makarov" opf:role="aut">Makarov Pavel</dc:creator>
+        <dc:contributor opf:file-as="calibre" opf:role="bkp">calibre (8.1.1) [https://calibre-ebook.com]</dc:contributor>
+        <dc:date>0101-01-01T00:00:00+00:00</dc:date>
+        <dc:description>&lt;div&gt;
+&lt;p&gt;Привет, общество!&lt;/p&gt;&lt;/div&gt;</dc:description>
+        <dc:language>rus</dc:language>
+        <meta name="calibre:timestamp" content="2025-03-30T10:15:34.365822+00:00"/>
+        <meta name="calibre:title_sort" content="Makarov Pavel"/>
+    </metadata>
+    <guide>
+        <reference type="cover" title="Обложка" href="Makarov Pavel - Makarov Pavel.jpg"/>
+    </guide>
+</package>
