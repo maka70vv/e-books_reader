@@ -30,3 +30,43 @@ def extract_text_from_epub(epub_path):
             text += soup.get_text()
 
     return text
+
+
+def extract_text_from_fb2(fb2_path):
+    from bs4 import BeautifulSoup
+    import os
+
+    if not os.path.exists(fb2_path):
+        print(f"Ошибка: файл {fb2_path} не существует.")
+        return ""
+
+    with open(fb2_path, 'r', encoding='utf-8') as file:
+        content = file.read()
+
+    soup = BeautifulSoup(content, 'lxml-xml')
+    text = ""
+    seen_text = set()  # Множество для отслеживания уникальных строк
+
+    body = soup.find('body')
+    if not body:
+        print("Ошибка: в FB2-файле не найден тег <body>.")
+        return ""
+
+    for p_tag in body.find_all('p', recursive=True):
+        paragraph_text = p_tag.get_text().strip()
+        if paragraph_text and paragraph_text not in seen_text:  # Добавляем только уникальные строки
+            text += paragraph_text + "\n"
+            seen_text.add(paragraph_text)
+
+    final_text = text.strip()
+    if not final_text:
+        print("Итоговый текст пустой. Возможно, в FB2 нет содержимого в <body>.")
+    else:
+        print(f"Извлечённый текст (первые 50 символов): {final_text[:50]}...")
+
+    return final_text
+
+# Использование
+text_from_fb2 = extract_text_from_fb2("input/input_fb2.fb2")
+print("Результат:")
+print(text_from_fb2)
