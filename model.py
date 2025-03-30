@@ -64,7 +64,8 @@ class TTSDataset(Dataset):
         # Транспонируем MFCC для соответствия входному размеру LSTM
         mfcc = mfcc.T  # Теперь размерность будет [seq_len, input_size] (150, 40)
 
-        return torch.tensor(mfcc, dtype=torch.float32), text
+        return torch.tensor(mfcc, dtype=torch.float32), y  # Возвращаем аудио также для вокодера
+
 
 
 # Простейшая акустическая модель
