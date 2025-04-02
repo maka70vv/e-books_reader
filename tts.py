@@ -9,8 +9,8 @@ import numpy as np
 from filters import filter_text
 
 # Пути к файлам
-dataset_path = "data/test/normal_voices"
-xlsx_path = "data/test/Speeches.xlsx"
+dataset_path = "data/prod/audio"
+xlsx_path = "data/prod/Speeches.xlsx"
 
 # Читаем данные из Excel
 df = pd.read_excel(xlsx_path)
@@ -26,7 +26,7 @@ for _, row in df.iterrows():
     if os.path.exists(audio_path):
         y, sr = librosa.load(audio_path, sr=22050)
         mfcc = librosa.feature.mfcc(y=y, sr=sr)
-        audio_data[text] = (y, sr, mfcc)
+        audio_data[wav_file] = (y, sr, mfcc)
 
 
 # Функция поиска ближайшего совпадения
@@ -63,7 +63,7 @@ def generate_speech(text, audio_data, output_file):
             ref_audio, ref_sr, ref_mfcc = audio_data[ref_text]
 
             # Берем MFCC случайного реального аудиофайла
-            text_mfcc = ref_mfcc
+            text_mfcc = ref_mfcc.copy()
             speech_segment = find_closest_match(text_mfcc, audio_data)
             speech_segments.append(speech_segment)
 

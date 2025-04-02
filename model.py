@@ -84,7 +84,7 @@ class AcousticModel(nn.Module):
 
 # Загрузка данных
 transcriptions = load_transcriptions(tts.xlsx_path)
-dataset = TTSDataset("data/test/normal_voices", transcriptions)
+dataset = TTSDataset("data/prod/audio", transcriptions)
 dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True)
 
 # Инициализация модели и оптимизатора

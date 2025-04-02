@@ -56,7 +56,7 @@ optimizer = optim.Adam(vocoder.parameters(), lr=model.LEARNING_RATE)
 
 # Загрузка данных
 transcriptions = model.load_transcriptions(tts.xlsx_path)
-dataset = model.TTSDataset("data/test/normal_voices", transcriptions)
+dataset = model.TTSDataset("data/prod/audio", transcriptions)
 dataloader = DataLoader(dataset, batch_size=model.BATCH_SIZE, shuffle=True)
 
 # Тренировка вокодера

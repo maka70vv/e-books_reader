@@ -65,8 +65,3 @@ def extract_text_from_fb2(fb2_path):
         print(f"Извлечённый текст (первые 50 символов): {final_text[:50]}...")
 
     return final_text
-
-# Использование
-text_from_fb2 = extract_text_from_fb2("input/input_fb2.fb2")
-print("Результат:")
-print(text_from_fb2)
