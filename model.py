@@ -1,5 +1,4 @@
 import os
-
 import numpy as np
 import pandas as pd
 import librosa
@@ -7,6 +6,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
+from torch.nn.utils.rnn import pad_sequence  # Для динамического паддинга
 
 import tts
 from filters import filter_text
@@ -21,29 +21,28 @@ LEARNING_RATE = 0.001
 # Чтение данных из Excel
 def load_transcriptions(excel_path):
     df = pd.read_excel(excel_path)
-
-    # Загружаем аудиофайлы и их MFCC
     transcriptions = {}
+
     for _, row in df.iterrows():
-        wav_file = row["file"]  # Используем значение из столбца "file" для аудиофайла
-        text = row["text"]  # Текст из столбца "text"
-        text = filter_text(text)  # Применяем фильтрацию текста
-        audio_path = os.path.join(tts.dataset_path, f"{wav_file}.wav")  # Создаем путь к аудиофайлу
+        wav_file = row["file"]  # Имя файла
+        text = row["text"]  # Текстовая расшифровка
+        text = filter_text(text)  # Фильтрация текста
+        audio_path = os.path.join(tts.dataset_path, f"{wav_file}.wav")  # Путь к аудиофайлу
 
         if os.path.exists(audio_path):
-            y, sr = librosa.load(audio_path, sr=22050)
-            mfcc = librosa.feature.mfcc(y=y, sr=sr)
-            transcriptions[wav_file] = (text, mfcc)  # Сохраняем имя файла и текст
+            y, sr = librosa.load(audio_path, sr=SAMPLE_RATE)
+            mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=N_MFCC)
+            transcriptions[wav_file] = (text, mfcc)
+
     return transcriptions
 
 
 # Подготовка данных
 class TTSDataset(Dataset):
-    def __init__(self, dataset_path, transcriptions, max_length=150):
+    def __init__(self, dataset_path, transcriptions):
         self.dataset_path = dataset_path
         self.transcriptions = transcriptions
         self.audio_files = list(transcriptions.keys())
-        self.max_length = max_length
 
     def __len__(self):
         return len(self.audio_files)
@@ -55,17 +54,16 @@ class TTSDataset(Dataset):
         y, sr = librosa.load(audio_path, sr=SAMPLE_RATE)
         mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=N_MFCC)
 
-        if mfcc.shape[1] > self.max_length:
-            mfcc = mfcc[:, :self.max_length]  # Обрезаем
-        elif mfcc.shape[1] < self.max_length:
-            padding = self.max_length - mfcc.shape[1]
-            mfcc = np.pad(mfcc, ((0, 0), (0, padding)), mode='constant')  # Паддинг
+        mfcc = torch.tensor(mfcc.T, dtype=torch.float32)  # Транспонируем MFCC
 
-        # Транспонируем MFCC для соответствия входному размеру LSTM
-        mfcc = mfcc.T  # Теперь размерность будет [seq_len, input_size] (150, 40)
+        return mfcc, y  # Возвращаем MFCC и оригинальный аудиосигнал
 
-        return torch.tensor(mfcc, dtype=torch.float32), y  # Возвращаем аудио также для вокодера
 
+# Функция для динамического паддинга внутри DataLoader
+def collate_fn(batch):
+    mfccs, y = zip(*batch)  # Разбираем батч
+    mfccs = pad_sequence(mfccs, batch_first=True, padding_value=0)  # Делаем паддинг
+    return mfccs, y  # Возвращаем батч с одинаковыми размерами
 
 
 # Простейшая акустическая модель
@@ -76,7 +74,6 @@ class AcousticModel(nn.Module):
         self.fc = nn.Linear(hidden_dim, output_dim)
 
     def forward(self, x):
-        # x имеет размерность [batch_size, seq_len, input_size]
         lstm_out, _ = self.lstm(x)
         output = self.fc(lstm_out)
         return output
@@ -85,7 +82,7 @@ class AcousticModel(nn.Module):
 # Загрузка данных
 transcriptions = load_transcriptions(tts.xlsx_path)
 dataset = TTSDataset("data/prod/audio", transcriptions)
-dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True)
+dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_fn)
 
 # Инициализация модели и оптимизатора
 model = AcousticModel()
@@ -102,7 +99,8 @@ for epoch in range(EPOCHS):
         loss.backward()
         optimizer.step()
         total_loss += loss.item()
-    print(f"Epoch {epoch+1}/{EPOCHS}, Loss: {total_loss/len(dataloader)}")
+
+    print(f"Epoch {epoch + 1}/{EPOCHS}, Loss: {total_loss / len(dataloader)}")
 
 # Сохранение модели
 torch.save(model.state_dict(), "tts_acoustic_model.pth")
