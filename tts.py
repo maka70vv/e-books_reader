@@ -56,6 +56,7 @@ def generate_speech(text, audio_data, output_file):
             speech, sr, _ = audio_data[wav_file]
             speech_segments.append(speech)
         else:
+            print(word)
             ref_wav_file = next(iter(audio_data))  # Первый доступный файл
             ref_audio, ref_sr, ref_mfcc = audio_data[ref_wav_file]
 
