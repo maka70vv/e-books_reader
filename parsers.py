@@ -1,12 +1,11 @@
 def extract_text_from_pdf(pdf_path):
-    import fitz
+    import pdfplumber
 
-    doc = fitz.open(pdf_path)  # Открываем PDF
     text = ""
 
-    for page_num in range(doc.page_count):
-        page = doc.load_page(page_num)  # Загружаем страницу
-        text += page.get_text("text")  # Извлекаем текст из страницы
+    with pdfplumber.open(pdf_path) as pdf:
+        for page in pdf.pages:
+            text += page.extract_text()  # Извлекаем текст с каждой страницы
 
     return text
 
