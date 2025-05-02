@@ -4,7 +4,11 @@ import pandas as pd
 import soundfile as sf
 from fastdtw import fastdtw
 import numpy as np
+import torch
 from filters import filter_text
+from model import AcousticModel
+from text_to_secuence import text_to_sequence
+from vocoder import Vocoder
 
 # Пути к файлам
 dataset_path = "data/prod/audio"
@@ -12,6 +16,11 @@ xlsx_path = "data/prod/Speeches.xlsx"
 
 # Читаем данные из Excel
 df = pd.read_excel(xlsx_path)
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+acoustic_model = AcousticModel().to(device)
+vocoder = Vocoder().to(device)
 
 # Загружаем аудиофайлы и их MFCC
 audio_data = {}
@@ -50,6 +59,9 @@ def generate_speech(text, audio_data, output_file):
     words = text.split()
     speech_segments = []
 
+    acoustic_model.eval()
+    vocoder.eval()
+
     for word in words:
         if word in text_to_wav:
             wav_file = text_to_wav[word]
@@ -57,12 +69,17 @@ def generate_speech(text, audio_data, output_file):
             speech_segments.append(speech)
         else:
             print(word)
-            ref_wav_file = next(iter(audio_data))  # Первый доступный файл
-            ref_audio, ref_sr, ref_mfcc = audio_data[ref_wav_file]
+            seq_tensor = text_to_sequence(word).unsqueeze(0).to(device)
 
-            text_mfcc = np.array(ref_mfcc)
-            speech_segment = find_closest_match(text_mfcc, audio_data)
-            speech_segments.append(speech_segment)
+            with torch.no_grad():
+                predicted_mfcc = acoustic_model(seq_tensor)
+                predicted_mfcc = predicted_mfcc.permute(0, 2, 1)
+
+                predicted_audio = vocoder(predicted_mfcc)
+                audio = predicted_audio.squeeze().cpu().numpy()
+                audio = audio / np.max(np.abs(audio) + 1e-6)
+
+                speech_segments.append(audio)
 
     full_speech = np.concatenate(speech_segments)
     sf.write(output_file, full_speech, 22050)
