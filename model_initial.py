@@ -1,11 +1,7 @@
-import librosa
-import numpy as np
-import pandas as pd
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.nn.utils.rnn import pad_sequence  # Для динамического паддинга
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import DataLoader
 
 import tts
 from model import load_transcriptions, TTSDataset, BATCH_SIZE, collate_fn, LEARNING_RATE, AcousticModel, EPOCHS

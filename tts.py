@@ -76,10 +76,13 @@ def generate_speech(text, audio_data, output_file):
 
                 predicted_audio = vocoder(predicted_mfcc)
                 audio = predicted_audio.squeeze().cpu().numpy()
-                audio = audio / np.max(np.abs(audio) + 1e-6)
-
+                audio = audio / (np.max(np.abs(audio)) + 1e-6)
                 speech_segments.append(audio)
 
     full_speech = np.concatenate(speech_segments)
-    sf.write(output_file, full_speech, 22050)
 
+    # Ускоряем аудио
+    full_speech = librosa.effects.time_stretch(full_speech.astype(np.float32), rate=1.5)
+
+    # Сохраняем
+    sf.write(output_file, full_speech, 22050)
