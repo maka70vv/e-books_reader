@@ -8,7 +8,6 @@ import torch.nn as nn
 from torch.nn.utils.rnn import pad_sequence  # Для динамического паддинга
 from torch.utils.data import Dataset, DataLoader
 
-import tts
 from filters import filter_text
 
 # Гиперпараметры
@@ -27,7 +26,7 @@ def load_transcriptions(excel_path):
         wav_file = row["file"]  # Имя файла
         text = row["text"]  # Текстовая расшифровка
         text = filter_text(text)  # Фильтрация текста
-        audio_path = os.path.join(tts.dataset_path, f"{wav_file}.wav")  # Путь к аудиофайлу
+        audio_path = os.path.join("data/prod/audio", f"{wav_file}.wav")  # Путь к аудиофайлу
 
         if os.path.exists(audio_path):
             y, sr = librosa.load(audio_path, sr=SAMPLE_RATE)

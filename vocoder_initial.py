@@ -5,7 +5,6 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 
 import model
-import tts
 from vocoder import Vocoder
 
 
@@ -28,7 +27,7 @@ criterion = nn.MSELoss()
 optimizer = optim.Adam(vocoder.parameters(), lr=model.LEARNING_RATE)
 
 # Загрузка данных
-transcriptions = model.load_transcriptions(tts.xlsx_path)
+transcriptions = model.load_transcriptions("data/prod/Speeches.xlsx")
 dataset = model.TTSDataset("data/prod/audio", transcriptions)
 dataloader = DataLoader(dataset, batch_size=model.BATCH_SIZE, shuffle=True)
 

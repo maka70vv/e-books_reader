@@ -68,7 +68,6 @@ def generate_speech(text, audio_data, output_file):
             speech, sr, _ = audio_data[wav_file]
             speech_segments.append(speech)
         else:
-            print(word)
             seq_tensor = text_to_sequence(word).unsqueeze(0).to(device)
 
             with torch.no_grad():

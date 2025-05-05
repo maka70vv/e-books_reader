@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>Чтение книги</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .reader-container {
+            max-height: 80vh;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <h3>Онлайн-чтение</h3>
+            <div class="reader-container">
+                {{ text }}
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <h4>Озвучить книгу</h4>
+            <form method="post" class="mt-3">
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="range_type" value="all" id="allRange" checked>
+                    <label class="form-check-label" for="allRange">Весь текст</label>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="radio" name="range_type" value="range" id="rangeRange">
+                    <label class="form-check-label" for="rangeRange">Выбрать страницы</label>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <input type="number" class="form-control" name="start" min="1" max="{{ pages }}"
+                               placeholder="С страницы">
+                    </div>
+                    <div class="col">
+                        <input type="number" class="form-control" name="end" min="1" max="{{ pages }}"
+                               placeholder="По страницу">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success w-100">Сгенерировать аудио</button>
+            </form>
+
+            {% if audio_url %}
+            <div class="mt-4">
+                <h5>Результат:</h5>
+                <audio controls class="w-100">
+                    <source src="{{ audio_url }}" type="audio/wav">
+                    Ваш браузер не поддерживает аудиопроигрыватель.
+                </audio>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+</body>
+</html>
