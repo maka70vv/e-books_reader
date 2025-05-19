@@ -15,13 +15,12 @@ def train_vocoder(model, dataloader, criterion, optimizer):
         optimizer.zero_grad()
         mfccs = mfccs.transpose(1, 2)  # Размерность [batch_size, input_dim, seq_len]
         outputs = model(mfccs)  # Восстанавливаем аудио из MFCC
-        loss = criterion(outputs, audios)  # Считаем ошибку
+        loss = criterion(outputs, audios)
         loss.backward()
         optimizer.step()
         total_loss += loss.item()
     return total_loss / len(dataloader)
 
-# Инициализация модели и оптимизатора
 vocoder = Vocoder(input_dim=model.N_MFCC)
 criterion = nn.MSELoss()
 optimizer = optim.Adam(vocoder.parameters(), lr=model.LEARNING_RATE)

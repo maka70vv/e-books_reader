@@ -16,7 +16,6 @@ model = AcousticModel()
 criterion = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
-# Обучение модели
 for epoch in range(EPOCHS):
     total_loss = 0
     for mfccs, _ in dataloader:
@@ -29,5 +28,4 @@ for epoch in range(EPOCHS):
 
     print(f"Epoch {epoch + 1}/{EPOCHS}, Loss: {total_loss / len(dataloader)}")
 
-# Сохранение модели
 torch.save(model.state_dict(), "tts_acoustic_model.pth")

@@ -5,28 +5,26 @@ import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
-from torch.nn.utils.rnn import pad_sequence  # Для динамического паддинга
+from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import Dataset, DataLoader
 
 from filters import filter_text
 
-# Гиперпараметры
 SAMPLE_RATE = 22050
 N_MFCC = 40
 BATCH_SIZE = 16
 EPOCHS = 50
 LEARNING_RATE = 0.001
 
-# Чтение данных из Excel
 def load_transcriptions(excel_path):
     df = pd.read_excel(excel_path)
     transcriptions = {}
 
     for _, row in df.iterrows():
-        wav_file = row["file"]  # Имя файла
-        text = row["text"]  # Текстовая расшифровка
-        text = filter_text(text)  # Фильтрация текста
-        audio_path = os.path.join("data/prod/audio", f"{wav_file}.wav")  # Путь к аудиофайлу
+        wav_file = row["file"]
+        text = row["text"]
+        text = filter_text(text)
+        audio_path = os.path.join("data/prod/audio", f"{wav_file}.wav")
 
         if os.path.exists(audio_path):
             y, sr = librosa.load(audio_path, sr=SAMPLE_RATE)
@@ -53,9 +51,9 @@ class TTSDataset(Dataset):
         y, sr = librosa.load(audio_path, sr=SAMPLE_RATE)
         mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=N_MFCC)
 
-        mfcc = torch.tensor(mfcc.T, dtype=torch.float32)  # Транспонируем MFCC
+        mfcc = torch.tensor(mfcc.T, dtype=torch.float32)
 
-        return mfcc, y  # Возвращаем MFCC и оригинальный аудиосигнал
+        return mfcc, y
 
 
 # Функция для динамического паддинга внутри DataLoader

@@ -80,9 +80,5 @@ def generate_speech(text, audio_data, output_file):
                 speech_segments.append(audio)
 
     full_speech = np.concatenate(speech_segments)
-
-    # Ускоряем аудио
     full_speech = librosa.effects.time_stretch(full_speech.astype(np.float32), rate=1.5)
-
-    # Сохраняем
     sf.write(output_file, full_speech, 22050)
